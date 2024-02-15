@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/favicon.ico >
+    <title>
+        Hexo
+    </title>
+    <meta name="description" content=  >
+    <meta name="keywords" content= 博客, 知识记录 >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 7.1.1"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            第一次搭建个人博客问题及解决方法
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h2 id="序言"><a href="#序言" class="headerlink" title="序言"></a>序言</h2><p>这是记录我第一次搭建个人博客时所遇到的问题。参考资料是<a target="_blank" rel="noopener" href="https://pdpeng.github.io/2022/01/19/setup-personal-blog/">攻城狮杰森</a>的保姆级教程，这位大佬在博客内介绍地很详细，既有配置过程截图，也有知识科普，对于新人小白来说还蛮合适的。</p>
+<p>我只进行到教程的<code>GitHub Pages配置</code>部分，后面<code>服务器选购</code>及<code>域名</code>部分未进行。</p>
+<p>推荐指数：⭐⭐⭐⭐⭐。</p>
+<hr>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><blockquote>
+<p><strong>本机情况</strong><br>① 系统：Windows 11 家庭中文版<br>② 可科学上网<br>③ 图床使用 Picgo + Github  </p>
+</blockquote>
+<h3 id="问题一、Picgo配置"><a href="#问题一、Picgo配置" class="headerlink" title="问题一、Picgo配置"></a>问题一、Picgo配置</h3><p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402152228100.png"></p>
+<ul>
+<li><strong>Github默认分支名自2020年6月起由<code>master</code>变为<code>main</code>；</strong></li>
+<li><strong>设定的存储路径若不存在会自动创建；</strong></li>
+<li><strong>自定义域名格式为：<code>https://cdn.jsdelivr.net/gh/[用户名]/[仓库名]@main</code></strong></li>
+</ul>
+<h3 id="问题二、Git配置SSH公钥"><a href="#问题二、Git配置SSH公钥" class="headerlink" title="问题二、Git配置SSH公钥"></a>问题二、Git配置SSH公钥</h3><p>使用如下代码配置，前两行代码是在本地配置设定的用户名和邮箱（可在git bash内，也可在webstorm的终端内进行）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global user.name <span class="string">&quot;用户名&quot;</span></span><br><span class="line">$ git config --global user.email <span class="string">&quot;邮箱&quot;</span></span><br><span class="line">$ ssh-keygen -t rsa -C <span class="string">&quot;邮箱&quot;</span></span><br></pre></td></tr></table></figure>
+<p>随后回车三次，使用下面的代码获取密钥，复制密钥</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
+<p>进入<code>Github-&gt;Settings-&gt;SSH and GPG keys-&gt;New SSH key</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402152258299.png"></p>
+<p>Title可任取，密钥粘贴进Key内，使用如下代码进行连接测试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+<p>若出现如下代码则说明连接成功</p>
+<p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402152302032.png"></p>
+<h3 id="问题三、localhost-4000显示更新，Github仓库代码已更新，但github-io域名显示网页却未变化"><a href="#问题三、localhost-4000显示更新，Github仓库代码已更新，但github-io域名显示网页却未变化" class="headerlink" title="问题三、localhost:4000显示更新，Github仓库代码已更新，但github.io域名显示网页却未变化"></a>问题三、localhost:4000显示更新，Github仓库代码已更新，但github.io域名显示网页却未变化</h3><blockquote>
+<p>原因：Github的render不是实时的，代码是先上传到Github仓库，然后过一段时间会从Github仓库拉文件，渲染成静态页面，所以需要一段时间更新。</p>
+</blockquote>
+<hr>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>第一次成功把个人博客搭建完成，很有成就感，以后会在这里记录个人的学习历程。</p>
+
+    </div>
+
+    
+        <hr class="fhr">
+        <div id="vcomments"></div>
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: AAXBB | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
