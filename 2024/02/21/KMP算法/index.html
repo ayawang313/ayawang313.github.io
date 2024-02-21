@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/favicon.ico >
+    <title>
+        Hexo
+    </title>
+    <meta name="description" content=  >
+    <meta name="keywords" content= 博客, 知识记录 >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 7.1.1"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            KMP算法
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h2 id="序言"><a href="#序言" class="headerlink" title="序言"></a>序言</h2><p>KMP算法相较于朴素模式匹配算法（也称为<code>Brute-Force</code>算法）在时间复杂度方面有所提升，由原先的<code>O((n-m+1)m)</code>降低为<code>O(n+m)</code>，n和m分别是文本串长度和模式串长度。</p>
+<p>在学习KMP算法过程中，对其中<code>get_next</code>函数代码有所疑惑，在查找资料后豁然开朗，在此做下记录，以便以后查看。</p>
+<h2 id="具体内容"><a href="#具体内容" class="headerlink" title="具体内容"></a>具体内容</h2><p><code>get_next</code>函数目的是为了求得<code>next</code>数组，该数组说明了当我们遇到模式串中字符与文本串中字符不匹配时，能够在尽量<strong>减少重复匹配次数</strong>的情况下，在何处继续进行匹配。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402212102434.png"></p>
+<p>比如说，我们在第一次匹配完成后，发现模式串B中字符<code>f</code>与文本串A中字符<code>x</code>不匹配，按照朴素模式匹配算法，我们应当将模式串右移一位，继续进行单个字符的匹配，若仍有字符不匹配，则继续将模式串右移，直至匹配成功或遍历完字符串A仍未匹配成功。</p>
+<p>但通过观察可得：  </p>
+<ul>
+<li>在第一次匹配时，前5个字符匹配成功，在字符串<code>aabaa</code>中，第一个字符<code>a</code>与与第三个字符<code>b</code>是不同的，这也就意味着我们在朴素模式匹配时，将模式串B右移2位进行匹配的操作是可以省略的，而第二个字符<code>a</code>与第一个字符<code>a</code>相同，但与第三个字符<code>b</code>是不同的，那么将模式串B右移1位进行匹配的操作也是可以省略的；</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402212128302.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402212128315.png"></p>
+<ul>
+<li>在字符串<code>aabaa</code>中，前缀<code>aa</code>和后缀<code>aa</code>是相同的，这也就意味着我们在朴素模式匹配时，将模式串右移3位后的，前两次匹配是可以省略的，可以从模式串B的第三个字符开始匹配；</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402212133650.png"></p>
+<blockquote>
+<p>总结：如果第<code>k</code>个字符匹配不成功，可观察前<code>k-1</code>个字符，里面是否具有相同的前后缀，如果存在的话，则可以省去许多<strong>右移</strong>和<strong>匹配</strong>的步骤，大大节省时间。因此，如果获得模式串每个位置前（包括该位置）字符串的<strong>最大相同前后缀长度</strong>就很重要，这可以使我们知道该将模式串右移到哪个位置，以及从第几个字符开始匹配。</p>
+</blockquote>
+<hr>
+<p><code>next</code>数组就存储了这个信息，而<code>get_next</code>函数就是为了求得<code>next</code>数组的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void get_next(String S, int* next) &#123;</span><br><span class="line">    int i;              // 代表后缀末尾字符下标</span><br><span class="line">    int j = 0;          // 代表前缀末尾字符下标 &amp;&amp; 代表最大相同前后缀长度</span><br><span class="line">    next[0] = 0;</span><br><span class="line">    for (i = 1; i &lt; S.size(); i++) &#123;</span><br><span class="line">        while (j &gt; 0 &amp;&amp; S[j] != S[i])</span><br><span class="line">            j = next[j-1];      // ？</span><br><span class="line">        if (S[j] == S[i]) j++;  // 匹配成功需要将相同前后缀长度加1</span><br><span class="line">        next[i] = j;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>比较难理解的就是这段代码内注释打问号的部分，为什么<code>j</code>是回溯到<code>next[j-1]</code>的位置呢？<br>通过下面几张图来进行解释。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402212207144.png"></p>
+<p>其中，红色部分是已经匹配成功的前缀和后缀，<code>a</code>和<code>b</code>是下一个要匹配的字符，我们发现其不相同，那么按照<code>get_next</code>函数，我们应该跳转到<code>j=next[j-1]</code>的位置在进行匹配，而这个位置，其实是**B[模式串前<code>j-1</code>个字符的最长相同前后缀长度]**，字符串B的下标是从0开始的；</p>
+<p>因为红色部分是相同的，所以对其再找最长相同前后缀，就相当于<strong>对红色部分进行分割</strong>，而因为寻找的是相同的前后缀，所以此时分割后的四个红色区域都是相同的；</p>
+<p><img src="https://cdn.jsdelivr.net/gh/ayawang313/blogimage@main/imgs/202402212220944.png"></p>
+<p>如果此时<code>j</code>下标的字符和<code>i</code>下标的字符匹配，则可以直接将j加1来作为最长相同前后缀长度，若仍然不相同，则继续当前的操作，直到<code>j</code>变为0。</p>
+<p>这样就可以清楚我们为什么需要回溯到<code>j=next[j-1]</code>的位置在匹配了，目的是为了<strong>利用先前已经匹配成功的相同前后缀长度</strong>，来获得最长相同前后缀长度。</p>
+
+    </div>
+
+    
+        <hr class="fhr">
+        <div id="vcomments"></div>
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: AAXBB | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
